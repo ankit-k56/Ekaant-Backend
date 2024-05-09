@@ -11,6 +11,9 @@ app.use(express.json());
 app.use(cors());
 app.use("/auth", authRouter);
 app.use("/moods", authenticate, moodsRouter);
+app.get("/", (req, res) => {
+  res.send("Welcome to Ekaant API");
+})
 
 app.listen(8080, () => {
   try {
