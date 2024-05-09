@@ -14,9 +14,9 @@ export const register = async (req: Request, res: Response) => {
     const user = await User.create({ name, email, password, organisation, phoneNo });
     const token = user.generateAuthToken();
     sendMail(token, email);
-    res.status(201).json({ user, token });
+    return res.status(201).json({ user, token });
   } catch (error: any) {
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({ error: error.message });
   }
 };
 
@@ -41,9 +41,9 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid credentials" });
     }
     const token = user.generateAuthToken();
-    res.json({ user, token });
+    return res.json({ user, token });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 
