@@ -20,10 +20,10 @@ export const register = (req, res) => __awaiter(void 0, void 0, void 0, function
         const user = yield User.create({ name, email, password, organisation, phoneNo });
         const token = user.generateAuthToken();
         sendMail(token, email);
-        res.status(201).json({ user, token });
+        return res.status(201).json({ user, token });
     }
     catch (error) {
-        res.status(400).json({ error: error.message });
+        return res.status(400).json({ error: error.message });
     }
 });
 export const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -44,10 +44,10 @@ export const login = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             return res.status(400).json({ error: "Invalid credentials" });
         }
         const token = user.generateAuthToken();
-        res.json({ user, token });
+        return res.json({ user, token });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: error.message });
     }
 });
 export const verifyEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
