@@ -2,11 +2,14 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+import "dotenv/config";
 interface IUser extends mongoose.Document {
   name: string;
   email: string;
   password: string;
   organisation: string;
+  isEmailVerified: boolean;
+  phoneNo: string;
   generateAuthToken: () => string;
 }
 
@@ -23,6 +26,16 @@ const UserSchema = new mongoose.Schema<IUser>({
     unique: true,
     minlength: [5, "Email must be at least 5 characters long"],
     maxlength: [255, "Email must be at most 255 characters long"],
+  },
+  isEmailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  phoneNo:{
+    type: String,
+    required: [true, "Please enter your phone number"],
+    minlength: [10, "Phone number must be at least 10 characters long"],
+    maxlength: [13, "Phone number must be at most 13 characters long"],
   },
   password: {
     type: String,
@@ -41,7 +54,6 @@ const UserSchema = new mongoose.Schema<IUser>({
 UserSchema.pre("save", async function (next) {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 UserSchema.methods.generateAuthToken = function () {
   return jwt.sign({ _id: this._id }, process.env.JWT_SECRET as string, {
