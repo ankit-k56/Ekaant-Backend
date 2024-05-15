@@ -8,14 +8,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import UserMoods from "../models/UserMoods.js";
+import User from "../models/User.js";
 export const updateBreak = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id } = req.params;
-        const userMood = yield UserMoods.findById(id);
+        const { userId } = req.body;
+        const currDate = new Date();
+        currDate.setHours(0, 0, 0, 0);
+        const userMood = yield UserMoods.findOneAndUpdate({
+            userId,
+            date: { $eq: currDate },
+        }, { $inc: { breaks: 1 } }).lean();
         if (!userMood) {
             return res.status(404).json({ error: "User mood not found" });
         }
-        yield UserMoods.updateOne({ _id: id }, { breaks: userMood.breaks + 1 });
         res.status(200).json({ message: "Break updated successfully" });
     }
     catch (err) {
@@ -23,16 +28,29 @@ export const updateBreak = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 export const createMood = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     try {
-        const { mood, date, breaks, userId } = req.body;
-        if (!mood || !date || !breaks || !userId) {
+        const { mood, date, userId } = req.body;
+        if (!mood || !date || !userId) {
             return res.status(400).json({ error: "Please enter all fields" });
         }
-        const userMood = yield UserMoods.create({ mood, date, breaks, userId });
-        res.status(201).json({ userMood });
+        const user = User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        let alredyMood = yield UserMoods.findOne({ userId, date });
+        if (alredyMood) {
+            alredyMood.mood = mood;
+            alredyMood = yield alredyMood.save();
+            const dat = (_a = alredyMood.date) === null || _a === void 0 ? void 0 : _a.toDateString();
+            return res.status(200).json({ userMood: alredyMood, dat });
+        }
+        const userMood = yield UserMoods.create({ mood, date, userId });
+        const dat = (_b = userMood.date) === null || _b === void 0 ? void 0 : _b.toDateString();
+        return res.status(201).json({ userMood, dat });
     }
     catch (err) {
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 });
 export const fetchMoods = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -47,4 +65,22 @@ export const fetchMoods = (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(200).json({ userMoods });
     }
     catch (error) { }
+});
+export const fetchBreak = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.body;
+        const currDate = new Date().toDateString();
+        const userMood = yield UserMoods.findOne({
+            userId,
+            date: currDate,
+        }).lean();
+        if (!userMood) {
+            return res.status(404).json({ error: "User mood not found" });
+        }
+        return res.status(200).json({ breaks: userMood.breaks });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: error.message });
+    }
 });

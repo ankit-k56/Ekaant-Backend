@@ -17,8 +17,16 @@ export const register = (req, res) => __awaiter(void 0, void 0, void 0, function
         if (!name || !email || !password || !organisation || !phoneNo) {
             return res.status(400).json({ error: "Please enter all fields" });
         }
-        const user = yield User.create({ name, email, password, organisation, phoneNo });
-        const token = user.generateAuthToken();
+        const user = yield User.create({
+            name,
+            email,
+            password,
+            organisation,
+            phoneNo,
+        });
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: "30d",
+        });
         sendMail(token, email);
         return res.status(201).json({ user, token });
     }
@@ -32,7 +40,7 @@ export const login = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!email || !password) {
             return res.status(400).json({ error: "Please enter all fields" });
         }
-        const user = yield User.findOne({ email }); // Find user by email
+        const user = yield User.findOne({ email }).lean(); // Find user by email
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
@@ -43,8 +51,19 @@ export const login = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!isPsswordMatch) {
             return res.status(400).json({ error: "Invalid credentials" });
         }
-        const token = user.generateAuthToken();
-        return res.json({ user, token });
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: "30d",
+        });
+        return res.json({
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                organisation: user.organisation,
+                phoneNo: user.phoneNo,
+            },
+            token,
+        });
     }
     catch (error) {
         return res.status(500).json({ error: error.message });
@@ -64,7 +83,7 @@ export const verifyEmail = (req, res) => __awaiter(void 0, void 0, void 0, funct
         }
         user.isEmailVerified = true;
         yield user.save();
-        res.status(200).json({ message: "Email verified" });
+        return res.status(200).json({ message: "Email verified" });
     }
     catch (error) {
         if (error instanceof jwt.TokenExpiredError) {

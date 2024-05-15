@@ -4,7 +4,6 @@ const UserMood = new mongoose.Schema({
   mood: String,
   date: {
     type: Date,
-    default: Date.now,
   },
   breaks: {
     type: Number,

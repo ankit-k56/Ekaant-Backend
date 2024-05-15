@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import "dotenv/config";
 import "dotenv/config";
 const UserSchema = new mongoose.Schema({
@@ -42,12 +41,18 @@ const UserSchema = new mongoose.Schema({
         minlength: [8, "Password must be at least 8 characters long"],
         maxlength: [1024, "Password must be at most 1024 characters long"],
     },
+    hasPaid: {
+        type: Boolean,
+        default: false,
+    },
     organisation: {
         type: String,
         required: [true, "Please enter your organisation"],
         minlength: [3, "Organisation must be at least 3 characters long"],
         maxlength: [255, "Organisation must be at most 255 characters long"],
     },
+}, {
+    timestamps: true, // Add timestamps to the schema
 });
 UserSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -55,9 +60,4 @@ UserSchema.pre("save", function (next) {
         this.password = yield bcrypt.hash(this.password, salt);
     });
 });
-UserSchema.methods.generateAuthToken = function () {
-    return jwt.sign({ _id: this._id }, process.env.JWT_SECRET, {
-        expiresIn: "30d",
-    });
-};
 export default mongoose.model("User", UserSchema);
