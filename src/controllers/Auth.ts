@@ -2,11 +2,10 @@ import User from "../models/User.js";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-// import sendMail from "../utils/SendMail.js";
+import sendMail from "../utils/SendMail.js";
 
 export const register = async (req: Request, res: Response) => {
   try {
-    return res.status(200).json({ message: "Login successful" });
     const { name, email, password, organisation, phoneNo } = req.body;
     if (!name || !email || !password || !organisation || !phoneNo) {
       return res.status(400).json({ error: "Please enter all fields" });
@@ -26,7 +25,7 @@ export const register = async (req: Request, res: Response) => {
         expiresIn: "30d",
       }
     );
-    // sendMail(token, email);
+    sendMail(token, email);
     return res.status(201).json({ user, token });
   } catch (error: any) {
     return res.status(400).json({ error: error.message });
