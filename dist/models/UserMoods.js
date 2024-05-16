@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 const UserMood = new mongoose.Schema({
-    mood: String,
+    mood: {
+        type: Number,
+        default: 0,
+    },
     date: {
         type: Date,
     },
