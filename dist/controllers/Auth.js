@@ -10,9 +10,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import sendMail from "../utils/SendMail.js";
+// import sendMail from "../utils/SendMail.js";
 export const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        return res.status(200).json({ message: "Login successful" });
         const { name, email, password, organisation, phoneNo } = req.body;
         if (!name || !email || !password || !organisation || !phoneNo) {
             return res.status(400).json({ error: "Please enter all fields" });
@@ -27,7 +28,7 @@ export const register = (req, res) => __awaiter(void 0, void 0, void 0, function
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
             expiresIn: "30d",
         });
-        sendMail(token, email);
+        // sendMail(token, email);
         return res.status(201).json({ user, token });
     }
     catch (error) {
