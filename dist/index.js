@@ -13,10 +13,10 @@ app.use("/moods", authenticate, moodsRouter);
 app.get("/", (req, res) => {
     res.send("Welcome to Ekaant API");
 });
-app.listen(8080, () => {
+app.listen(process.env.PORT, () => {
     try {
         connectToDb(process.env.MONGO_URL);
-        console.log("Listening on port 8080");
+        console.log(`Listening on port ${process.env.PORT}`);
     }
     catch (error) {
         console.log("Error connecting to the database: ", error);
