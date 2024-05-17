@@ -11,6 +11,10 @@ import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import sendMail from "../utils/SendMail.js";
+import path from "path";
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 export const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, email, password, organisation, phoneNo } = req.body;
@@ -83,17 +87,18 @@ export const verifyEmail = (req, res) => __awaiter(void 0, void 0, void 0, funct
         }
         user.isEmailVerified = true;
         yield user.save();
-        return res.status(200).json({ message: "Email verified" });
+        res.status(200).sendFile(path.join(__dirname, "../../public/failed.html"));
+        // return res.status(200).json({ message: "Email verified" });
     }
     catch (error) {
-        if (error instanceof jwt.TokenExpiredError) {
-            return res.status(401).json({ error: "Token expired" });
-        }
-        else if (error instanceof jwt.JsonWebTokenError) {
-            return res.status(401).json({ error: "Invalid token" });
-        }
-        else {
-            return res.status(500).json({ error: "Internal server error" }); // Handle unexpected errors
-        }
+        // if (error instanceof jwt.TokenExpiredError) {
+        //   return res.status(401).json({ error: "Token expired" });
+        // } else if (error instanceof jwt.JsonWebTokenError) {
+        //   return res.status(401).json({ error: "Invalid token" });
+        // } else {
+        //   return res.status(500).json({ error: "Internal server error" }); // Handle unexpected errors
+        // }
+        console.log(error);
+        res.status(500).sendFile(path.join(__dirname, "../../public/failed.html"));
     }
 });

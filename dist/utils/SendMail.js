@@ -11,7 +11,7 @@ const sendMail = (token, userEmail) => {
     const mailOptions = {
         from: "ankitkumar19041@gmail.com",
         to: userEmail,
-        subject: "Test Email",
+        subject: "Email Verification",
         html: `<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
     <h1 style="text-align: center; color: #1a1a1a;">Verify Your Email</h1>
     <p style="text-align: center; color: #1a1a1a;">Hi </p>

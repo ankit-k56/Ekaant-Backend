@@ -3,6 +3,11 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import sendMail from "../utils/SendMail.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -88,14 +93,17 @@ export const verifyEmail = async (req: Request, res: Response) => {
     }
     user.isEmailVerified = true;
     await user.save();
-    return res.status(200).json({ message: "Email verified" });
+    res.status(200).sendFile(path.join(__dirname, "../../public/failed.html"));
+    // return res.status(200).json({ message: "Email verified" });
   } catch (error: any) {
-    if (error instanceof jwt.TokenExpiredError) {
-      return res.status(401).json({ error: "Token expired" });
-    } else if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(401).json({ error: "Invalid token" });
-    } else {
-      return res.status(500).json({ error: "Internal server error" }); // Handle unexpected errors
-    }
+    // if (error instanceof jwt.TokenExpiredError) {
+    //   return res.status(401).json({ error: "Token expired" });
+    // } else if (error instanceof jwt.JsonWebTokenError) {
+    //   return res.status(401).json({ error: "Invalid token" });
+    // } else {
+    //   return res.status(500).json({ error: "Internal server error" }); // Handle unexpected errors
+    // }
+    console.log(error);
+    res.status(500).sendFile(path.join(__dirname, "../../public/failed.html"));
   }
 };
