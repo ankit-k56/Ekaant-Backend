@@ -56,15 +56,21 @@ export const createMood = (req, res) => __awaiter(void 0, void 0, void 0, functi
 export const fetchMoods = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req.body;
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        const today = new Date();
+        const dayOfWeek = today.getDay();
+        const lastMonday = new Date(today);
+        lastMonday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+        const thisSaturday = new Date(lastMonday);
+        thisSaturday.setDate(lastMonday.getDate() + 5);
         const userMoods = yield UserMoods.find({
             userId,
-            date: { $gte: oneWeekAgo },
-        });
+            date: { $gte: lastMonday, $lt: thisSaturday },
+        }).sort({ date: 1 });
         res.status(200).json({ userMoods });
     }
-    catch (error) { }
+    catch (error) {
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 export const fetchBreak = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
