@@ -2,15 +2,21 @@ import nodemailer from "nodemailer";
 import "dotenv/config";
 const sendMail = (token: string, userEmail: string) => {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtpout.secureserver.net",
+    secure: true,
+    tls: {
+      ciphers: "SSLv3",
+    },
+    requireTLS: true,
+    port: 465,
+    debug: true,
     auth: {
       user: process.env.EMAIL_ADDRESS,
       pass: process.env.EMAIL_PASS,
     },
   });
-
   const mailOptions = {
-    from: "ankitkumar19041@gmail.com",
+    from: process.env.EMAIL_ADDRESS,
     to: userEmail,
     subject: "Email Verification",
     html: `<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
