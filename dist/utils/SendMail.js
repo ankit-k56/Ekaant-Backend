@@ -24,7 +24,7 @@ const sendMail = (token, userEmail) => {
     <p style="text-align: center; color: #1a1a1a;">Hi </p>
     <p style="text-align: center; color: #1a1a1a;">Thanks for Signing up for Ekaant. Please verify your email by clicking the button below.</p>
     <div style="text-align: center;">
-      <a href="http://localhost:8080/auth/verify-email/${token}" style="background-color: #1a1a1a; color: #fff; padding: 10px 20px; border-radius: 5px; text-decoration: none;">Verify Email</a>
+      <a href="https://ekaant.azurewebsites.net/auth/verify-email/${token}" style="background-color: #1a1a1a; color: #fff; padding: 10px 20px; border-radius: 5px; text-decoration: none;">Verify Email</a>
     </div>
     <p style="text-align: center; color: #1a1a1a;">Regards,<br />Ekaant Ai</p>`,
     };

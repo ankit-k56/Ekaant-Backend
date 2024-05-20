@@ -59,9 +59,12 @@ export const fetchMoods = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const today = new Date();
         const dayOfWeek = today.getDay();
         const lastMonday = new Date(today);
-        lastMonday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+        lastMonday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+        lastMonday.setHours(0, 0, 0, 0);
         const thisSaturday = new Date(lastMonday);
-        thisSaturday.setDate(lastMonday.getDate() + 5);
+        thisSaturday.setDate(lastMonday.getDate() + 6);
+        thisSaturday.setHours(23, 59, 59, 999);
+        // Fetch moods within the calculated date range
         const userMoods = yield UserMoods.find({
             userId,
             date: { $gte: lastMonday, $lt: thisSaturday },
