@@ -95,7 +95,9 @@ export const verifyEmail = async (req: Request, res: Response) => {
     }
     user.isEmailVerified = true;
     await user.save();
-    res.status(200).sendFile(path.join(__dirname, "../../public/failed.html"));
+    res
+      .status(200)
+      .sendFile(path.join(__dirname, "../../public/verified.html"));
     // return res.status(200).json({ message: "Email verified" });
   } catch (error: any) {
     // if (error instanceof jwt.TokenExpiredError) {
