@@ -1,24 +1,24 @@
 import nodemailer from "nodemailer";
 import "dotenv/config";
-const sendMail = (token: string, userEmail: string) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtpout.secureserver.net",
-    secure: true,
-    tls: {
-      ciphers: "SSLv3",
-    },
-    requireTLS: true,
-    port: 465,
-    debug: true,
-    auth: {
-      user: process.env.EMAIL_ADDRESS,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-  const mailOptions = {
-    from: process.env.EMAIL_ADDRESS,
+
+import sgMail, { MailDataRequired } from "@sendgrid/mail";
+
+const apiKey = process.env.SENDGRID_API_KEY as string;
+sgMail.setApiKey(apiKey);
+
+export const sendMail = async (
+  token: string,
+  userEmail: string
+): Promise<{
+  success: boolean;
+  message: string;
+}> => {
+  // const sgMail = require("@sendgrid/mail");
+
+  const emailData: MailDataRequired = {
     to: userEmail,
-    subject: "Email Verification",
+    from: process.env.EMAIL_FROM as string,
+    subject: "Email verification",
     html: `<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
     <h1 style="text-align: center; color: #1a1a1a;">Verify Your Email</h1>
     <p style="text-align: center; color: #1a1a1a;">Hi </p>
@@ -29,12 +29,12 @@ const sendMail = (token: string, userEmail: string) => {
     <p style="text-align: center; color: #1a1a1a;">Regards,<br />Ekaant Ai</p>`,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error("Error occurred:", error);
-    } else {
-      console.log("Email sent:", info.response);
-    }
-  });
+  try {
+    const response = await sgMail.send(emailData);
+    console.log("Email sent successfully to :", userEmail);
+    return { success: true, message: "Email sent successfully" };
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return { success: false, message: "Error sending email" };
+  }
 };
-export default sendMail;
