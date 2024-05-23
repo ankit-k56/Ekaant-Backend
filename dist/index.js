@@ -7,6 +7,7 @@ import authenticate from "./middleware/authentication.js";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import { rateProduct } from "./controllers/Rating.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
@@ -15,6 +16,7 @@ app.use(cors());
 app.use(express.static(path.join(__dirname + "/../public")));
 app.use("/auth", authRouter);
 app.use("/moods", authenticate, moodsRouter);
+app.post("/rate", authenticate, rateProduct);
 app.get("/", (req, res) => {
     res.send("Welcome to Ekaant API");
 });

@@ -87,7 +87,9 @@ export const verifyEmail = (req, res) => __awaiter(void 0, void 0, void 0, funct
         }
         user.isEmailVerified = true;
         yield user.save();
-        res.status(200).sendFile(path.join(__dirname, "../../public/failed.html"));
+        res
+            .status(200)
+            .sendFile(path.join(__dirname, "../../public/verified.html"));
         // return res.status(200).json({ message: "Email verified" });
     }
     catch (error) {
