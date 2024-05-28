@@ -6,10 +6,15 @@ import moodsRouter from "./routes/MoodsRouter.js";
 import authenticate from "./middleware/authentication.js";
 import cors from "cors";
 import path from "path";
+// import Razorpay from "razorpay";
 import { fileURLToPath } from "url";
 import { rateProduct } from "./controllers/Rating.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+// export const instance = new Razorpay({
+//   key_id: process.env.RAZORPAY_KEY_ID as string,
+//   key_secret: process.env.RAZORPAY_KEY_SECRET as string,
+// });
 const app = express();
 app.use(express.json());
 app.use(cors());

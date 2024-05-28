@@ -31,7 +31,7 @@ export const createMood = (req, res) => __awaiter(void 0, void 0, void 0, functi
     var _a, _b;
     try {
         const { mood, date, userId } = req.body;
-        if (!mood || !date || !userId) {
+        if (!date || !userId) {
             return res.status(400).json({ error: "Please enter all fields" });
         }
         const user = User.findById(userId);
