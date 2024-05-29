@@ -21,10 +21,12 @@ export const register = (req, res) => __awaiter(void 0, void 0, void 0, function
         if (!name || !email || !password || !organisation || !phoneNo) {
             return res.status(400).json({ error: "Please enter all fields" });
         }
+        const salt = yield bcrypt.genSalt(10);
+        const hashedPassword = yield bcrypt.hash(password, salt);
         const user = yield User.create({
             name,
             email,
-            password,
+            password: hashedPassword,
             organisation,
             phoneNo,
         });
@@ -81,12 +83,9 @@ export const verifyEmail = (req, res) => __awaiter(void 0, void 0, void 0, funct
         }
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const { _id } = decoded;
-        const user = yield User.findById(_id);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        user.isEmailVerified = true;
-        yield user.save();
+        yield User.findByIdAndUpdate(_id, {
+            isEmailVerified: true,
+        });
         res
             .status(200)
             .sendFile(path.join(__dirname, "../../public/verified.html"));

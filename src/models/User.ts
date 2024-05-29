@@ -1,7 +1,4 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import "dotenv/config";
 import "dotenv/config";
 interface IUser extends mongoose.Document {
   name: string;
@@ -61,9 +58,9 @@ const UserSchema = new mongoose.Schema<IUser>(
   }
 );
 
-UserSchema.pre("save", async function (next) {
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-});
+// UserSchema.pre("save", async function (next) {
+//   const salt = await bcrypt.genSalt(10);
+//   this.password = await bcrypt.hash(this.password, salt);
+// });
 
 export default mongoose.model<IUser>("User", UserSchema);

@@ -1,15 +1,4 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
-import "dotenv/config";
 import "dotenv/config";
 const UserSchema = new mongoose.Schema({
     name: {
@@ -54,10 +43,8 @@ const UserSchema = new mongoose.Schema({
 }, {
     timestamps: true, // Add timestamps to the schema
 });
-UserSchema.pre("save", function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const salt = yield bcrypt.genSalt(10);
-        this.password = yield bcrypt.hash(this.password, salt);
-    });
-});
+// UserSchema.pre("save", async function (next) {
+//   const salt = await bcrypt.genSalt(10);
+//   this.password = await bcrypt.hash(this.password, salt);
+// });
 export default mongoose.model("User", UserSchema);

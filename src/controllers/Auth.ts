@@ -16,11 +16,13 @@ export const register = async (req: Request, res: Response) => {
     if (!name || !email || !password || !organisation || !phoneNo) {
       return res.status(400).json({ error: "Please enter all fields" });
     }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({
       name,
       email,
-      password,
+      password: hashedPassword,
       organisation,
       phoneNo,
     });
@@ -89,12 +91,10 @@ export const verifyEmail = async (req: Request, res: Response) => {
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
     const { _id } = decoded as { _id: string };
-    const user = await User.findById(_id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    user.isEmailVerified = true;
-    await user.save();
+    await User.findByIdAndUpdate(_id, {
+      isEmailVerified: true,
+    });
+
     res
       .status(200)
       .sendFile(path.join(__dirname, "../../public/verified.html"));

@@ -1,4 +1,3 @@
-import nodemailer from "nodemailer";
 import "dotenv/config";
 
 import sgMail, { MailDataRequired } from "@sendgrid/mail";
