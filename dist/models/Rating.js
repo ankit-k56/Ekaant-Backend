@@ -4,6 +4,9 @@ const RatingSchema = new mongoose.Schema({
         type: Number,
         required: [true, "Please enter your rating"],
     },
+    feedback: {
+        type: String,
+    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",

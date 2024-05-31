@@ -12,12 +12,12 @@ import Rating from "../models/Rating.js";
 export const rateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // Rate the product
     try {
-        const { rating, userId } = req.body;
+        const { rating, feedback, userId } = req.body;
         const user = yield User.findById(userId).lean();
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
-        yield Rating.create({ rating, userId });
+        yield Rating.create({ rating, feedback, userId });
         return res.status(201).json({ rmessage: "Rating added successfully" });
     }
     catch (error) {
