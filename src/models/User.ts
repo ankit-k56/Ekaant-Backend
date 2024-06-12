@@ -8,6 +8,7 @@ interface IUser extends mongoose.Document {
   hasPaid: boolean;
   isEmailVerified: boolean;
   phoneNo: string;
+  freeTrailStartDate: Date;
 }
 
 const UserSchema = new mongoose.Schema<IUser>(
@@ -51,6 +52,9 @@ const UserSchema = new mongoose.Schema<IUser>(
       required: [true, "Please enter your organisation"],
       minlength: [3, "Organisation must be at least 3 characters long"],
       maxlength: [255, "Organisation must be at most 255 characters long"],
+    },
+    freeTrailStartDate: {
+      type: Date,
     },
   },
   {

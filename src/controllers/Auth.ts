@@ -75,6 +75,7 @@ export const login = async (req: Request, res: Response) => {
         email: user.email,
         organisation: user.organisation,
         phoneNo: user.phoneNo,
+        freeTrailStartDate: user.freeTrailStartDate,
       },
       token,
     });
@@ -93,6 +94,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
     const { _id } = decoded as { _id: string };
     await User.findByIdAndUpdate(_id, {
       isEmailVerified: true,
+      freeTrailStartDate: new Date(),
     });
 
     res
