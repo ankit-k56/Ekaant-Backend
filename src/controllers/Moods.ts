@@ -96,3 +96,16 @@ export const fetchBreak = async (req: Request, res: Response) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+export const updateFirstTime = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({ error: "Please enter all fields" });
+    }
+    await User.findByIdAndUpdate(userId, { firstTime: false });
+    return res.status(200).json({ message: "First time updated" });
+  } catch (error: any) {
+    return res.status(400).json({ error: error.message });
+  }
+};

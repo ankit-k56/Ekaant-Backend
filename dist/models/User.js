@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 import "dotenv/config";
+export var UserType;
+(function (UserType) {
+    UserType["Admin"] = "admin";
+    UserType["User"] = "user";
+    UserType["Organization"] = "organization";
+})(UserType || (UserType = {}));
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -24,6 +30,12 @@ const UserSchema = new mongoose.Schema({
         minlength: [10, "Phone number must be at least 10 characters long"],
         maxlength: [13, "Phone number must be at most 13 characters long"],
     },
+    userType: {
+        type: String,
+        required: [true, "Please enter your type"],
+        default: UserType.User,
+        enum: Object.values(UserType),
+    },
     password: {
         type: String,
         required: [true, "Please enter your password"],
@@ -34,11 +46,18 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    organisation: {
+    organization: {
         type: String,
-        required: [true, "Please enter your organisation"],
-        minlength: [3, "Organisation must be at least 3 characters long"],
-        maxlength: [255, "Organisation must be at most 255 characters long"],
+        required: [true, "Please enter your Organization"],
+        minlength: [3, "Organization must be at least 3 characters long"],
+        maxlength: [255, "Organization must be at most 255 characters long"],
+    },
+    firstTime: {
+        type: Boolean,
+        default: true,
+    },
+    freeTrailStartDate: {
+        type: Date,
     },
 }, {
     timestamps: true, // Add timestamps to the schema

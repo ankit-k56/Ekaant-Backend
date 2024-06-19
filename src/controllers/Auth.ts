@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
+import { UserType } from "../models/User.js";
 import { sendMail } from "../utils/SendMail.js";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -10,11 +10,38 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const allowedDomains = ["gmail.com", "yahoo.com", "hotmail.com", "ekaant.co"];
+
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, organisation, phoneNo } = req.body;
-    if (!name || !email || !password || !organisation || !phoneNo) {
+    const { name, email, password, organization, phoneNo, userType } = req.body;
+    console.log(req.body);
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !organization ||
+      !phoneNo ||
+      !userType
+    ) {
       return res.status(400).json({ error: "Please enter all fields" });
+    }
+
+    const existing = await User.findOne({ email }).lean();
+    if (existing) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
+    if (userType === UserType.Organization) {
+      if (!organization) {
+        return res.status(400).json({ error: "Please enter Organization" });
+      }
+      const emailDomain = email.split("@")[1];
+      if (!allowedDomains.includes(emailDomain)) {
+        return res
+          .status(400)
+          .json({ error: "Please enter your company email address" });
+      }
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -23,8 +50,9 @@ export const register = async (req: Request, res: Response) => {
       name,
       email,
       password: hashedPassword,
-      organisation,
+      organization,
       phoneNo,
+      userType,
     });
     const token = jwt.sign(
       { _id: user._id },
@@ -55,6 +83,10 @@ export const login = async (req: Request, res: Response) => {
     if (!user.isEmailVerified) {
       return res.status(400).json({ error: "Please verify your email" });
     }
+    // if (user.firstTime) {
+    //   user.firstTime = false;
+    //   await user.save();
+    // }
 
     const isPsswordMatch = await bcrypt.compare(password, user.password);
 
@@ -73,8 +105,12 @@ export const login = async (req: Request, res: Response) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        organisation: user.organisation,
+        organization: user.organization,
         phoneNo: user.phoneNo,
+        isEmailVerified: user.isEmailVerified,
+        hasPaid: user.hasPaid,
+        userType: user.userType,
+        firstTime: user.firstTime,
         freeTrailStartDate: user.freeTrailStartDate,
       },
       token,

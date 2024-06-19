@@ -10,16 +10,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { UserType } from "../models/User.js";
 import { sendMail } from "../utils/SendMail.js";
 import path from "path";
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const allowedDomains = ["gmail.com", "yahoo.com", "hotmail.com", "ekaant.co"];
 export const register = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name, email, password, organisation, phoneNo } = req.body;
-        if (!name || !email || !password || !organisation || !phoneNo) {
+        const { name, email, password, organization, phoneNo, userType } = req.body;
+        console.log(req.body);
+        if (!name ||
+            !email ||
+            !password ||
+            !organization ||
+            !phoneNo ||
+            !userType) {
             return res.status(400).json({ error: "Please enter all fields" });
+        }
+        const existing = yield User.findOne({ email }).lean();
+        if (existing) {
+            return res.status(400).json({ error: "User already exists" });
+        }
+        if (userType === UserType.Organization) {
+            if (!organization) {
+                return res.status(400).json({ error: "Please enter Organization" });
+            }
+            const emailDomain = email.split("@")[1];
+            if (!allowedDomains.includes(emailDomain)) {
+                return res
+                    .status(400)
+                    .json({ error: "Please enter your company email address" });
+            }
         }
         const salt = yield bcrypt.genSalt(10);
         const hashedPassword = yield bcrypt.hash(password, salt);
@@ -27,8 +50,9 @@ export const register = (req, res) => __awaiter(void 0, void 0, void 0, function
             name,
             email,
             password: hashedPassword,
-            organisation,
+            organization,
             phoneNo,
+            userType,
         });
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
             expiresIn: "30d",
@@ -53,6 +77,10 @@ export const login = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (!user.isEmailVerified) {
             return res.status(400).json({ error: "Please verify your email" });
         }
+        // if (user.firstTime) {
+        //   user.firstTime = false;
+        //   await user.save();
+        // }
         const isPsswordMatch = yield bcrypt.compare(password, user.password);
         if (!isPsswordMatch) {
             return res.status(400).json({ error: "Invalid credentials" });
@@ -65,8 +93,13 @@ export const login = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 _id: user._id,
                 name: user.name,
                 email: user.email,
-                organisation: user.organisation,
+                organization: user.organization,
                 phoneNo: user.phoneNo,
+                isEmailVerified: user.isEmailVerified,
+                hasPaid: user.hasPaid,
+                userType: user.userType,
+                firstTime: user.firstTime,
+                freeTrailStartDate: user.freeTrailStartDate,
             },
             token,
         });
@@ -85,6 +118,7 @@ export const verifyEmail = (req, res) => __awaiter(void 0, void 0, void 0, funct
         const { _id } = decoded;
         yield User.findByIdAndUpdate(_id, {
             isEmailVerified: true,
+            freeTrailStartDate: new Date(),
         });
         res
             .status(200)

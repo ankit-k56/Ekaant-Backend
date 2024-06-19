@@ -1,11 +1,20 @@
 import mongoose from "mongoose";
 import "dotenv/config";
+
+export enum UserType {
+  Admin = "admin",
+  User = "user",
+  Organization = "organization",
+}
+
 interface IUser extends mongoose.Document {
   name: string;
   email: string;
   password: string;
-  organisation: string;
+  organization: string;
   hasPaid: boolean;
+  firstTime: boolean;
+  userType: UserType;
   isEmailVerified: boolean;
   phoneNo: string;
   freeTrailStartDate: Date;
@@ -36,6 +45,12 @@ const UserSchema = new mongoose.Schema<IUser>(
       minlength: [10, "Phone number must be at least 10 characters long"],
       maxlength: [13, "Phone number must be at most 13 characters long"],
     },
+    userType: {
+      type: String,
+      required: [true, "Please enter your type"],
+      default: UserType.User,
+      enum: Object.values(UserType),
+    },
     password: {
       type: String,
       required: [true, "Please enter your password"],
@@ -47,11 +62,15 @@ const UserSchema = new mongoose.Schema<IUser>(
       default: false,
     },
 
-    organisation: {
+    organization: {
       type: String,
-      required: [true, "Please enter your organisation"],
-      minlength: [3, "Organisation must be at least 3 characters long"],
-      maxlength: [255, "Organisation must be at most 255 characters long"],
+      required: [true, "Please enter your Organization"],
+      minlength: [3, "Organization must be at least 3 characters long"],
+      maxlength: [255, "Organization must be at most 255 characters long"],
+    },
+    firstTime: {
+      type: Boolean,
+      default: true,
     },
     freeTrailStartDate: {
       type: Date,

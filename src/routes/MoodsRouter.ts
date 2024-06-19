@@ -6,11 +6,13 @@ import {
   createMood,
   fetchMoods,
   fetchBreak,
+  updateFirstTime,
 } from "../controllers/Moods.js";
 
 router.post("/update-break", updateBreak);
 router.post("/create-mood", createMood);
 router.get("/fetch-moods", fetchMoods);
 router.get("/fetch-break", fetchBreak);
+router.patch("/update-firsttime", updateFirstTime);
 
 export default router;

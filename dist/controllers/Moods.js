@@ -93,3 +93,16 @@ export const fetchBreak = (req, res) => __awaiter(void 0, void 0, void 0, functi
         return res.status(500).json({ error: error.message });
     }
 });
+export const updateFirstTime = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.body;
+        if (!userId) {
+            return res.status(400).json({ error: "Please enter all fields" });
+        }
+        yield User.findByIdAndUpdate(userId, { firstTime: false });
+        return res.status(200).json({ message: "First time updated" });
+    }
+    catch (error) {
+        return res.status(400).json({ error: error.message });
+    }
+});
