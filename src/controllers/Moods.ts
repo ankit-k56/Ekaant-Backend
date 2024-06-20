@@ -108,20 +108,7 @@ export const updateFirstTime = async (req: Request, res: Response) => {
       { firstTime: false },
       { new: true }
     );
-    return res.status(200).json({
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        organization: user.organization,
-        phoneNo: user.phoneNo,
-        isEmailVerified: user.isEmailVerified,
-        hasPaid: user.hasPaid,
-        userType: user.userType,
-        firstTime: user.firstTime,
-        freeTrailStartDate: user.freeTrailStartDate,
-      },
-    });
+    return res.status(200).json({ message: "First time updated successfully" });
   } catch (error: any) {
     return res.status(400).json({ error: error.message });
   }
