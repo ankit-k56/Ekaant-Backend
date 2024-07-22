@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import UserMoods from "../models/UserMoods.js";
 import User from "../models/User.js";
+import mongoose from "mongoose";
 export const updateBreak = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req.body;
@@ -99,10 +100,62 @@ export const updateFirstTime = (req, res) => __awaiter(void 0, void 0, void 0, f
         if (!userId) {
             return res.status(400).json({ error: "Please enter all fields" });
         }
-        yield User.findByIdAndUpdate(userId, { firstTime: false });
-        return res.status(200).json({ message: "First time updated" });
+        const user = yield User.findByIdAndUpdate(userId, { firstTime: false }, { new: true });
+        return res.status(200).json({ message: "First time updated successfully" });
     }
     catch (error) {
         return res.status(400).json({ error: error.message });
+    }
+});
+export const fetchAverageMoods = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.body;
+        const currentYear = new Date().getFullYear();
+        const userMoods = yield UserMoods.find({ userId });
+        console.log(userMoods);
+        const averageMoods = yield UserMoods.aggregate([
+            {
+                $match: {
+                    userId: new mongoose.Types.ObjectId(userId),
+                    date: {
+                        $gte: new Date(currentYear, 0, 1),
+                        $lt: new Date(currentYear + 1, 0, 1),
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: { $month: "$date" },
+                    averageMood: { $avg: "$mood" },
+                },
+            },
+            {
+                $sort: { _id: 1 },
+            },
+        ]);
+        // Format the response to include month names
+        const monthNames = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+        ];
+        console.log(averageMoods);
+        const formattedResponse = averageMoods.map((item) => ({
+            month: monthNames[item._id - 1],
+            averageMood: item.averageMood.toFixed(2), // format to 2 decimal places
+        }));
+        res.status(200).json(formattedResponse);
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message });
     }
 });

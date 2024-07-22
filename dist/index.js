@@ -4,6 +4,8 @@ import "dotenv/config";
 import authRouter from "./routes/AuthRouter.js";
 import moodsRouter from "./routes/MoodsRouter.js";
 import authenticate from "./middleware/authentication.js";
+import wellBeingQuestionsRouter from "./routes/WellBeingQuestions.js";
+import ProgrammeRouter from "./routes/Programme.js";
 import cors from "cors";
 import path from "path";
 // import Razorpay from "razorpay";
@@ -22,6 +24,8 @@ app.use(express.static(path.join(__dirname + "/../public")));
 app.use("/auth", authRouter);
 app.use("/moods", authenticate, moodsRouter);
 app.post("/rate", authenticate, rateProduct);
+app.use("/well-being", authenticate, wellBeingQuestionsRouter);
+app.use("/programme", authenticate, ProgrammeRouter);
 app.get("/", (req, res) => {
     res.send("Welcome to Ekaant API");
 });

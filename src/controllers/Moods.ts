@@ -1,6 +1,7 @@
 import UserMoods from "../models/UserMoods.js";
 import User from "../models/User.js";
 import { Request, Response } from "express";
+import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -111,5 +112,58 @@ export const updateFirstTime = async (req: Request, res: Response) => {
     return res.status(200).json({ message: "First time updated successfully" });
   } catch (error: any) {
     return res.status(400).json({ error: error.message });
+  }
+};
+
+export const fetchAverageMoods = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.body;
+    const currentYear = new Date().getFullYear();
+
+    const averageMoods = await UserMoods.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          date: {
+            $gte: new Date(currentYear, 0, 1),
+            $lt: new Date(currentYear + 1, 0, 1),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$date" },
+          averageMood: { $avg: "$mood" },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+
+    // Format the response to include month names
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const formattedResponse = averageMoods.map((item) => ({
+      month: monthNames[item._id - 1],
+      averageMood: item.averageMood.toFixed(2), // format to 2 decimal places
+    }));
+
+    res.status(200).json(formattedResponse);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
   }
 };
